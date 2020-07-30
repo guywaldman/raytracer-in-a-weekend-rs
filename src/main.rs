@@ -1,7 +1,11 @@
 use crate::vec3::Vec3;
+use hittable::{HitRecord, Hittable};
 use ray::Ray;
+use sphere::Sphere;
 
+mod hittable;
 mod ray;
+mod sphere;
 mod vec3;
 
 fn vec_to_color(v: &Vec3) -> String {
@@ -13,16 +17,16 @@ fn vec_to_color(v: &Vec3) -> String {
 
 /// Returns the background color -
 /// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
-fn ray_rgb_vec(r: &Ray) -> Vec3 {
+fn ray_rgb_vec(ray: &Ray) -> Vec3 {
     // Check intersection with sphere.
-    let sphere_center = vec3!(0.0, 0.0, -1.0);
-    let normal = r.hit_sphere(sphere_center, 0.5);
-    if let Some(n) = normal {
-        let n = (n - sphere_center).unit();
+    let sphere = Sphere::new(vec3!(0.0, 0.0, -1.0), 0.5);
+    let normal = sphere.hit(ray, 0.0, 1.0);
+    if let Some(HitRecord { normal, .. }) = normal {
+        let n = normal - sphere.center().unit();
         return 0.5 * vec3!(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
 
-    let unit = r.unit();
+    let unit = ray.unit();
     let t = 0.5 * (unit.y() + 1.0);
     vec3!(1.0, 1.0, 1.0) * (1.0 - t) + vec3!(0.5, 0.7, 1.0) * t
 }
