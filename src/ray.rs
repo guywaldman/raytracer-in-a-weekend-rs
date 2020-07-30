@@ -26,13 +26,20 @@ impl Ray {
         self.dir.unit()
     }
 
-    pub fn hits_sphere(&self, sphere_center: Vec3, sphere_radius: f64) -> bool {
+    /// Checks intersection with the received sphere.
+    /// If successful, return the normal.
+    pub fn hit_sphere(&self, sphere_center: Vec3, sphere_radius: f64) -> Option<Vec3> {
         let oc = self.origin() - sphere_center;
         let a = self.dir().length_squared();
         let b = oc.dot(&self.dir()) * 2.0;
         let c = oc.length_squared() - sphere_radius * sphere_radius;
         let discriminant = b * b - 4.0 * a * c;
-        discriminant > 0.0
+
+        if discriminant < 0.0 {
+            return None;
+        }
+
+        Some(self.at((-b - discriminant.sqrt()) / (2.0 * a)))
     }
 }
 
