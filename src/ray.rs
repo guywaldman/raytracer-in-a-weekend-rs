@@ -25,6 +25,15 @@ impl Ray {
     pub fn unit(&self) -> Vec3 {
         self.dir.unit()
     }
+
+    pub fn hits_sphere(&self, sphere_center: Vec3, sphere_radius: f64) -> bool {
+        let oc = self.origin() - sphere_center;
+        let a = self.dir().length_squared();
+        let b = oc.dot(&self.dir()) * 2.0;
+        let c = oc.length_squared() - sphere_radius * sphere_radius;
+        let discriminant = b * b - 4.0 * a * c;
+        discriminant > 0.0
+    }
 }
 
 #[macro_export]
@@ -38,7 +47,7 @@ macro_rules! ray {
 mod tests {
     #[allow(unused_imports)]
     use super::*;
-    
+
     #[test]
     fn at() {
         let ray = Ray::new(Vec3::new(2.0, 4.0, 6.0), Vec3::new(1.0, 0.0, 0.0));

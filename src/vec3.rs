@@ -24,12 +24,16 @@ impl Vec3 {
         self.z
     }
 
-    pub fn length(&self) -> Scalar {
-        ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).sqrt()
-    }
-
     pub fn dot(&self, other: &Self) -> Scalar {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
+    }
+
+    pub fn length(&self) -> Scalar {
+        self.dot(&self).sqrt()
+    }
+
+    pub fn length_squared(&self) -> Scalar {
+        self.dot(&self)
     }
 
     pub fn cross(&self, other: &Self) -> Self {

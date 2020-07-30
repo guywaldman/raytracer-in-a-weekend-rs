@@ -14,6 +14,9 @@ fn vec_to_color(v: &Vec3) -> String {
 /// Returns the background color -
 /// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
 fn ray_rgb_vec(r: &Ray) -> Vec3 {
+    if r.hits_sphere(vec3!(0.0, 0.0, -1.0), 0.5) {
+        return vec3!(1.0, 0.0, 0.0);
+    }
     let unit = r.unit();
     let t = 0.5 * (unit.y() + 1.0);
     vec3!(1.0, 1.0, 1.0) * (1.0 - t) + vec3!(0.5, 0.7, 1.0) * t
