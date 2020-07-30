@@ -1,4 +1,4 @@
-type Scalar = f64;
+pub(crate) type Scalar = f64;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub(crate) struct Vec3 {

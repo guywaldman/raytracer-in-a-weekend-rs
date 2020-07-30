@@ -1,6 +1,7 @@
 use crate::vec3::Vec3;
 
 mod vec3;
+mod ray;
 
 fn vec_to_color(v: Vec3) -> String {
     let x = v.x() * 255.999;
