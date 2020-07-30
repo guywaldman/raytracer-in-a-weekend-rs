@@ -7,6 +7,7 @@ fn main() {
     println!("255");
 
     for j in (0..height).rev() {
+        eprintln!("Scanlines: {}/{}", (height - j), height);
         for i in 0..width {
             let r = (i as f64) / (f64::from(width) - 1.0);
             let g = (j as f64) / (f64::from(height) - 1.0);
