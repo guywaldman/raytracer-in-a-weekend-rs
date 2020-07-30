@@ -1,4 +1,13 @@
+use crate::vec3::Vec3;
+
 mod vec3;
+
+fn vec_to_color(v: Vec3) -> String {
+    let x = v.x() * 255.999;
+    let y = v.y() * 255.999;
+    let z = v.z() * 255.999;
+    format!("{} {} {}", x, y, z)
+}
 
 fn main() {
     let width = 256;
@@ -15,11 +24,9 @@ fn main() {
             let g = (j as f64) / (f64::from(height) - 1.0);
             let b = 0.25;
 
-            let r_col = (r * 255.999) as u8;
-            let g_col = (g * 255.999) as u8;
-            let b_col = (b * 255.999) as u8;
+            let v = Vec3::new(r, g, b);
 
-            println!("{} {} {}", r_col, g_col, b_col);
+            println!("{}", vec_to_color(v));
         }
     }
 }

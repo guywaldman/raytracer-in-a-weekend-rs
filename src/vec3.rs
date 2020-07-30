@@ -1,7 +1,7 @@
 type Scalar = f64;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-struct Vec3 {
+pub(crate) struct Vec3 {
     x: Scalar,
     y: Scalar,
     z: Scalar,
