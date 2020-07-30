@@ -1,33 +1,59 @@
 use crate::vec3::Vec3;
+use ray::Ray;
 
-mod vec3;
 mod ray;
+mod vec3;
 
-fn vec_to_color(v: Vec3) -> String {
+fn vec_to_color(v: &Vec3) -> String {
     let x = v.x() * 255.999;
     let y = v.y() * 255.999;
     let z = v.z() * 255.999;
     format!("{} {} {}", x, y, z)
 }
 
+/// Returns the background color -
+/// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
+fn ray_rgb_vec(r: &Ray) -> Vec3 {
+    let unit = r.unit();
+    let t = 0.5 * (unit.y() + 1.0);
+    vec3!(1.0, 1.0, 1.0) * (1.0 - t) + vec3!(0.5, 0.7, 1.0) * t
+}
+
 fn main() {
-    let width = 256;
-    let height = 256;
+    // Image
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width: usize = 400;
+    let image_height = ((image_width as f64) / aspect_ratio) as usize;
+
+    // Camera
+    let viewport_height = 2.0;
+    let viewport_width = aspect_ratio * viewport_height;
+    let focal_length = 1.0;
+
+    let origin = vec3!(0.0, 0.0, 0.0);
+    let horizontal = vec3!(viewport_width, 0.0, 0.0);
+    let vertical = vec3!(0.0, viewport_height, 0.0);
+    let lower_left_corner =
+        origin - horizontal / 2.0 - vertical / 2.0 - vec3!(0.0, 0.0, focal_length);
 
     println!("P3");
-    println!("{} {}", width, height);
+    println!("{} {}", image_width, image_height);
     println!("255");
 
-    for j in (0..height).rev() {
-        eprintln!("Scanlines: {}/{}", (height - j), height);
-        for i in 0..width {
-            let r = (i as f64) / (f64::from(width) - 1.0);
-            let g = (j as f64) / (f64::from(height) - 1.0);
-            let b = 0.25;
+    for j in (0..image_height).rev() {
+        eprintln!("Scanlines: {}/{}", (image_height - j), image_height);
+        for i in 0..image_width {
+            let u = (i as f64) / ((image_width as f64) - 1.0);
+            let v = (j as f64) / ((image_height as f64) - 1.0);
 
-            let v = Vec3::new(r, g, b);
+            let ray = ray!(
+                origin,
+                lower_left_corner + u * horizontal + v * vertical - origin
+            );
 
-            println!("{}", vec_to_color(v));
+            let pixel_color = ray_rgb_vec(&ray);
+
+            println!("{}", vec_to_color(&pixel_color));
         }
     }
 }

@@ -21,6 +21,17 @@ impl Ray {
     pub fn at(&self, t: Scalar) -> Vec3 {
         self.origin + self.dir * t
     }
+
+    pub fn unit(&self) -> Vec3 {
+        self.dir.unit()
+    }
+}
+
+#[macro_export]
+macro_rules! ray {
+    ($origin: expr, $dir: expr) => {
+        Ray::new($origin, $dir)
+    };
 }
 
 #[cfg(test)]

@@ -39,6 +39,10 @@ impl Vec3 {
             z: self.x * other.y - self.y * other.x,
         }
     }
+
+    pub fn unit(&self) -> Self {
+        *self / self.length()
+    }
 }
 
 impl Default for Vec3 {
@@ -86,6 +90,17 @@ impl std::ops::Mul<Scalar> for Vec3 {
     }
 }
 
+impl std::ops::Mul<Vec3> for Scalar {
+    type Output = Vec3;
+    fn mul(self, v: Vec3) -> Self::Output {
+        Self::Output {
+            x: v.x * self,
+            y: v.y * self,
+            z: v.z * self,
+        }
+    }
+}
+
 impl std::ops::Div<Scalar> for Vec3 {
     type Output = Self;
     fn div(self, scalar: Scalar) -> Self::Output {
@@ -97,6 +112,13 @@ impl std::ops::Div<Scalar> for Vec3 {
     }
 }
 
+#[macro_export]
+macro_rules! vec3 {
+    ($x: expr, $y: expr, $z: expr) => {
+        Vec3::new($x, $y, $z)
+    };
+}
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
@@ -104,43 +126,43 @@ mod tests {
 
     #[test]
     fn add() {
-        let a = Vec3::new(1.0, 2.0, 3.0);
-        let b = Vec3::new(3.0, 11.0, 5.0);
-        assert_eq!(a + b, Vec3::new(4.0, 13.0, 8.0));
+        let a = vec3!(1.0, 2.0, 3.0);
+        let b = vec3!(3.0, 11.0, 5.0);
+        assert_eq!(a + b, vec3!(4.0, 13.0, 8.0));
     }
 
     #[test]
     fn sub() {
-        let a = Vec3::new(5.0, 3.0, 12.0);
-        let b = Vec3::new(2.0, 1.0, 2.0);
-        assert_eq!(a - b, Vec3::new(3.0, 2.0, 10.0));
+        let a = vec3!(5.0, 3.0, 12.0);
+        let b = vec3!(2.0, 1.0, 2.0);
+        assert_eq!(a - b, vec3!(3.0, 2.0, 10.0));
     }
 
     #[test]
     fn mul() {
-        let a = Vec3::new(5.0, 3.0, 12.0);
+        let a = vec3!(5.0, 3.0, 12.0);
         let scalar = 2.0;
-        assert_eq!(a * scalar, Vec3::new(10.0, 6.0, 24.0));
+        assert_eq!(a * scalar, vec3!(10.0, 6.0, 24.0));
     }
 
     #[test]
     fn div() {
-        let a = Vec3::new(18.0, 8.0, 4.0);
+        let a = vec3!(18.0, 8.0, 4.0);
         let scalar = 2.0;
-        assert_eq!(a / scalar, Vec3::new(9.0, 4.0, 2.0));
+        assert_eq!(a / scalar, vec3!(9.0, 4.0, 2.0));
     }
 
     #[test]
     fn dot() {
-        let a = Vec3::new(5.0, 8.0, 1.0);
-        let b = Vec3::new(2.0, 1.0, 5.0);
+        let a = vec3!(5.0, 8.0, 1.0);
+        let b = vec3!(2.0, 1.0, 5.0);
         assert_eq!(a.dot(&b), 23.0);
     }
 
     #[test]
     fn cross() {
-        let a = Vec3::new(1.0, 2.0, 3.0);
-        let b = Vec3::new(4.0, 5.0, 6.0);
-        assert_eq!(a.cross(&b), Vec3::new(-3.0, 6.0, -3.0));
+        let a = vec3!(1.0, 2.0, 3.0);
+        let b = vec3!(4.0, 5.0, 6.0);
+        assert_eq!(a.cross(&b), vec3!(-3.0, 6.0, -3.0));
     }
 }
