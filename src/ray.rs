@@ -31,15 +31,15 @@ impl Ray {
     pub fn hit_sphere(&self, sphere_center: Vec3, sphere_radius: f64) -> Option<Vec3> {
         let oc = self.origin() - sphere_center;
         let a = self.dir().length_squared();
-        let b = oc.dot(&self.dir()) * 2.0;
+        let half_b = oc.dot(&self.dir());
         let c = oc.length_squared() - sphere_radius * sphere_radius;
-        let discriminant = b * b - 4.0 * a * c;
+        let discriminant = half_b * half_b - a * c;
 
         if discriminant < 0.0 {
             return None;
         }
 
-        Some(self.at((-b - discriminant.sqrt()) / (2.0 * a)))
+        Some(self.at((-half_b - discriminant.sqrt()) / a))
     }
 }
 

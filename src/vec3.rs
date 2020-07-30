@@ -36,6 +36,7 @@ impl Vec3 {
         self.dot(&self)
     }
 
+    #[allow(dead_code)]
     pub fn cross(&self, other: &Self) -> Self {
         Self {
             x: self.y * other.z - self.z * other.y,
