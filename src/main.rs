@@ -32,6 +32,11 @@ fn color_vec_to_output(color_vec: &Vec3) -> String {
     g *= scale;
     b *= scale;
 
+    // Gamma-correct for gamma 2.0.
+    r = r.sqrt();
+    g = g.sqrt();
+    b = b.sqrt();
+
     // Write the translated [0,255] value of each color component.
     r = 256.0 * clamp(r, 0.0, 0.999);
     g = 256.0 * clamp(g, 0.0, 0.999);
