@@ -14,6 +14,7 @@ impl Sphere {
         Self { center, radius }
     }
 
+    #[allow(dead_code)]
     pub fn center(&self) -> Vec3 {
         self.center
     }
