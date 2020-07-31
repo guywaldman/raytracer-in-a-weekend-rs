@@ -42,11 +42,13 @@ impl Hittable for Sphere {
         let possible_params = vec![(-half_b - root) / a, (-half_b + root) / a];
         for t in possible_params.iter().find(|t| **t > t_min && **t < t_max) {
             let point = ray.at(*t);
-            return Some(HitRecord {
-                t: *t,
-                point,
-                normal: (point - self.center) / self.radius,
-            });
+            let outward_normal = (point - self.center) / self.radius;
+            return Some(HitRecord::new(
+                &point,
+                &outward_normal,
+                *t,
+                &ray
+            ));
         }
 
         None
