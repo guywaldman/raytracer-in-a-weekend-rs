@@ -18,7 +18,8 @@ mod ray;
 mod sphere;
 mod world;
 
-const SAMPLES_PER_PIXEL: usize = 10;
+const SAMPLES_PER_PIXEL: usize = 30;
+const MAX_BOUNCE_DEPTH: usize = 30;
 
 fn color_vec_to_output(color_vec: &Vec3) -> String {
     let mut r = color_vec.x();
@@ -40,12 +41,17 @@ fn color_vec_to_output(color_vec: &Vec3) -> String {
 
 /// Returns the background color -
 /// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
-fn pixel_color_for_ray(ray: &Ray, world: &World) -> Vec3 {
+fn pixel_color_for_ray(ray: &Ray, world: &World, depth: usize) -> Vec3 {
+    // If exceeded ray bounce limit, no more light should be gathered.
+    if depth <= 0 {
+        return vec3!(0.0, 0.0, 0.0);
+    }
+
     // Check intersection with world.
     if let Some(HitRecord { normal, point, .. }) = world.hit(&ray, 0.0, std::f64::MAX) {
         let target = point + normal + Vec3::random_in_unit_sphere();
         // Shoot a random diffuse bounce ray and recurse.
-        return 0.5 * pixel_color_for_ray(&Ray::new(point, target - point), world);
+        return 0.5 * pixel_color_for_ray(&Ray::new(point, target - point), world, depth - 1);
     }
 
     let unit = ray.unit();
@@ -75,6 +81,7 @@ fn main() {
 
     for j in (0..image_height).rev() {
         eprintln!("Scanlines: {}/{}", (image_height - j), image_height);
+
         for i in 0..image_width {
             // Antialiasing - sample and average color around each pixel.
             let mut pixel_color = vec3!(0.0, 0.0, 0.0);
@@ -82,7 +89,7 @@ fn main() {
                 let u = ((i as f64) + random_scalar(0.0, 1.0)) / ((image_width as f64) - 1.0);
                 let v = ((j as f64) + random_scalar(0.0, 1.0)) / ((image_height as f64) - 1.0);
                 let ray = camera.get_ray(u, v);
-                pixel_color += pixel_color_for_ray(&ray, &world);
+                pixel_color += pixel_color_for_ray(&ray, &world, MAX_BOUNCE_DEPTH);
             }
 
             println!("{}", color_vec_to_output(&pixel_color));
