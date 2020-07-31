@@ -2,11 +2,13 @@ use crate::vec3::Vec3;
 use hittable::{HitRecord, Hittable};
 use ray::Ray;
 use sphere::Sphere;
+use world::World;
 
 mod hittable;
 mod ray;
 mod sphere;
 mod vec3;
+mod world;
 
 fn vec_to_color(v: &Vec3) -> String {
     let x = v.x() * 255.999;
@@ -17,13 +19,10 @@ fn vec_to_color(v: &Vec3) -> String {
 
 /// Returns the background color -
 /// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
-fn ray_rgb_vec(ray: &Ray) -> Vec3 {
+fn pixel_color_for_ray(ray: &Ray, world: &World) -> Vec3 {
     // Check intersection with sphere.
-    let sphere = Sphere::new(vec3!(0.0, 0.0, -1.0), 0.5);
-    let normal = sphere.hit(ray, 0.0, 1.0);
-    if let Some(HitRecord { normal, .. }) = normal {
-        let n = normal - sphere.center().unit();
-        return 0.5 * vec3!(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+    if let Some(HitRecord { normal, .. }) = world.hit(&ray, 0.0, std::f64::MAX) {
+        return 0.5 * (normal + vec3!(1.0, 1.0, 1.0));
     }
 
     let unit = ray.unit();
@@ -41,6 +40,13 @@ fn main() {
     let viewport_height = 2.0;
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
+
+    // World
+    let mut world = World::new();
+    let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), 0.5);
+    let sphere_2 = Sphere::new(vec3!(0.0, -100.5, -1.0), 100.0);
+    world.add_hittable(&sphere_1);
+    world.add_hittable(&sphere_2);
 
     let origin = vec3!(0.0, 0.0, 0.0);
     let horizontal = vec3!(viewport_width, 0.0, 0.0);
@@ -63,7 +69,7 @@ fn main() {
                 lower_left_corner + u * horizontal + v * vertical - origin
             );
 
-            let pixel_color = ray_rgb_vec(&ray);
+            let pixel_color = pixel_color_for_ray(&ray, &world);
 
             println!("{}", vec_to_color(&pixel_color));
         }
