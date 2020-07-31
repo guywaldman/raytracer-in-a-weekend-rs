@@ -72,6 +72,12 @@ impl std::ops::Add for Vec3 {
     }
 }
 
+impl std::ops::AddAssign for Vec3 {
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
+    }
+}
+
 impl std::ops::Sub for Vec3 {
     type Output = Self;
 

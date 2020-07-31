@@ -1,24 +1,40 @@
+use rand::Rng;
 use crate::vec3::Vec3;
+use camera::Camera;
 use hittable::{HitRecord, Hittable};
 use ray::Ray;
 use sphere::Sphere;
 use world::World;
-use camera::Camera;
+use math::clamp;
 
 #[macro_use]
 mod vec3;
 
 mod camera;
 mod hittable;
+mod math;
 mod ray;
 mod sphere;
 mod world;
 
-fn vec_to_color(v: &Vec3) -> String {
-    let x = v.x() * 255.999;
-    let y = v.y() * 255.999;
-    let z = v.z() * 255.999;
-    format!("{} {} {}", x, y, z)
+const SAMPLES_PER_PIXEL: usize = 10;
+
+fn color_vec_to_output(color_vec: &Vec3) -> String {
+    let mut r = color_vec.x();
+    let mut g = color_vec.y();
+    let mut b = color_vec.z();
+
+    // Divide the color by the number of samples.
+    let scale = 1.0 / (SAMPLES_PER_PIXEL as f64);
+    r *= scale;
+    g *= scale;
+    b *= scale;
+
+    // Write the translated [0,255] value of each color component.
+    r = 256.0 * clamp(r, 0.0, 0.999);
+    g = 256.0 * clamp(g, 0.0, 0.999);
+    b = 256.0 * clamp(b, 0.0, 0.999);
+    format!("{} {} {}", r as u64, g as u64, b as u64)
 }
 
 /// Returns the background color -
@@ -57,12 +73,17 @@ fn main() {
     for j in (0..image_height).rev() {
         eprintln!("Scanlines: {}/{}", (image_height - j), image_height);
         for i in 0..image_width {
-            let u = (i as f64) / ((image_width as f64) - 1.0);
-            let v = (j as f64) / ((image_height as f64) - 1.0);
-            let ray = camera.get_ray(u, v);
-            let pixel_color = pixel_color_for_ray(&ray, &world);
+            // Antialiasing - sample and average color around each pixel.
+            let mut rng = rand::thread_rng();
+            let mut pixel_color = vec3!(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = ((i as f64) + rng.gen::<f64>()) / ((image_width as f64) - 1.0);
+                let v = ((j as f64) + rng.gen::<f64>()) / ((image_height as f64) - 1.0);
+                let ray = camera.get_ray(u, v);
+                pixel_color += pixel_color_for_ray(&ray, &world);
+            }
 
-            println!("{}", vec_to_color(&pixel_color));
+            println!("{}", color_vec_to_output(&pixel_color));
         }
     }
 }
