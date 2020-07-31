@@ -1,11 +1,11 @@
-use rand::Rng;
+use crate::rand::random_scalar;
 use crate::vec3::Vec3;
 use camera::Camera;
 use hittable::{HitRecord, Hittable};
+use math::clamp;
 use ray::Ray;
 use sphere::Sphere;
 use world::World;
-use math::clamp;
 
 #[macro_use]
 mod vec3;
@@ -13,6 +13,7 @@ mod vec3;
 mod camera;
 mod hittable;
 mod math;
+mod rand;
 mod ray;
 mod sphere;
 mod world;
@@ -40,9 +41,11 @@ fn color_vec_to_output(color_vec: &Vec3) -> String {
 /// Returns the background color -
 /// a blue to white top-to-bottom gradient, depending on the ray Y coordinate.
 fn pixel_color_for_ray(ray: &Ray, world: &World) -> Vec3 {
-    // Check intersection with sphere.
-    if let Some(HitRecord { normal, .. }) = world.hit(&ray, 0.0, std::f64::MAX) {
-        return 0.5 * (normal + vec3!(1.0, 1.0, 1.0));
+    // Check intersection with world.
+    if let Some(HitRecord { normal, point, .. }) = world.hit(&ray, 0.0, std::f64::MAX) {
+        let target = point + normal + Vec3::random_in_unit_sphere();
+        // Shoot a random diffuse bounce ray and recurse.
+        return 0.5 * pixel_color_for_ray(&Ray::new(point, target - point), world);
     }
 
     let unit = ray.unit();
@@ -74,11 +77,10 @@ fn main() {
         eprintln!("Scanlines: {}/{}", (image_height - j), image_height);
         for i in 0..image_width {
             // Antialiasing - sample and average color around each pixel.
-            let mut rng = rand::thread_rng();
             let mut pixel_color = vec3!(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = ((i as f64) + rng.gen::<f64>()) / ((image_width as f64) - 1.0);
-                let v = ((j as f64) + rng.gen::<f64>()) / ((image_height as f64) - 1.0);
+                let u = ((i as f64) + random_scalar(0.0, 1.0)) / ((image_width as f64) - 1.0);
+                let v = ((j as f64) + random_scalar(0.0, 1.0)) / ((image_height as f64) - 1.0);
                 let ray = camera.get_ray(u, v);
                 pixel_color += pixel_color_for_ray(&ray, &world);
             }

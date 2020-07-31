@@ -1,3 +1,5 @@
+use crate::rand::random_scalar;
+
 pub(crate) type Scalar = f64;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -48,15 +50,29 @@ impl Vec3 {
     pub fn unit(&self) -> Self {
         *self / self.length()
     }
+
+    pub fn random(min: Scalar, max: Scalar) -> Self {
+        Self {
+            x: random_scalar(min, max),
+            y: random_scalar(min, max),
+            z: random_scalar(min, max),
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Vec3::random(-1.0, 1.0);
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
+    }
 }
 
 impl Default for Vec3 {
     fn default() -> Self {
-        Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }
+        Vec3 { x: 0.0, y: 0.0, z: 0.0 }
     }
 }
 
