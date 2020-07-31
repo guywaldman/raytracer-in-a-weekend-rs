@@ -53,7 +53,8 @@ fn pixel_color_for_ray(ray: &Ray, world: &World, depth: usize) -> Vec3 {
     }
 
     // Check intersection with world.
-    if let Some(HitRecord { normal, point, .. }) = world.hit(&ray, 0.0, std::f64::MAX) {
+    // Note: Using t_min of 0.001 to fix "shadow acne".
+    if let Some(HitRecord { normal, point, .. }) = world.hit(&ray, 0.001, std::f64::MAX) {
         let target = point + normal + Vec3::random_in_unit_sphere();
         // Shoot a random diffuse bounce ray and recurse.
         return 0.5 * pixel_color_for_ray(&Ray::new(point, target - point), world, depth - 1);
