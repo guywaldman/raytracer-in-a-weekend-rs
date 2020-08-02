@@ -8,6 +8,7 @@ use ray::Ray;
 use sphere::Sphere;
 use world::World;
 use material::{ScatterRecord, LambertianMaterial, MetalMaterial};
+use vec3::Scalar;
 
 #[macro_use]
 mod vec3;
@@ -31,7 +32,7 @@ fn color_vec_to_output(color_vec: &Vec3) -> String {
     let mut b = color_vec.z();
 
     // Divide the color by the number of samples.
-    let scale = 1.0 / (SAMPLES_PER_PIXEL as f64);
+    let scale = 1.0 / (SAMPLES_PER_PIXEL as Scalar);
     r *= scale;
     g *= scale;
     b *= scale;
@@ -76,7 +77,7 @@ fn main() {
     // Image
     let aspect_ratio = 16.0 / 9.0;
     let image_width: usize = 400;
-    let image_height = ((image_width as f64) / aspect_ratio) as usize;
+    let image_height = ((image_width as Scalar) / aspect_ratio) as usize;
 
     // Camera
     let camera = Camera::new();
@@ -101,8 +102,8 @@ fn main() {
             // Antialiasing - sample and average color around each pixel.
             let mut pixel_color = vec3!(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = ((i as f64) + random_scalar(0.0, 1.0)) / ((image_width as f64) - 1.0);
-                let v = ((j as f64) + random_scalar(0.0, 1.0)) / ((image_height as f64) - 1.0);
+                let u = ((i as Scalar) + random_scalar(0.0, 1.0)) / ((image_width as Scalar) - 1.0);
+                let v = ((j as Scalar) + random_scalar(0.0, 1.0)) / ((image_height as Scalar) - 1.0);
                 let ray = camera.get_ray(u, v);
                 pixel_color += pixel_color_for_ray(&ray, &world, MAX_BOUNCE_DEPTH);
             }

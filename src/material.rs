@@ -1,5 +1,5 @@
 use crate::hit_record::HitRecord;
-use crate::{ray::Ray, vec3::Vec3};
+use crate::{ray::Ray, vec3::{Scalar, Vec3}};
 
 pub(crate) struct ScatterRecord {
     pub attenuation: Vec3,
