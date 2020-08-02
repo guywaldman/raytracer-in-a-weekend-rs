@@ -86,10 +86,12 @@ fn main() {
     let mut world = World::new();
     let sphere_ground = Sphere::new(vec3!(0.0, -100.5, -1.0), LambertianMaterial::new(vec3!(0.5, 0.5, 0.5)), 100.0);
     let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), LambertianMaterial::new(vec3!(0.8, 0.4, 0.4)), 0.5);
-    let sphere_2 = Sphere::new(vec3!(-1.0, 0.0, -1.0), MetalMaterial::new(vec3!(0.8, 0.8, 0.8)), 0.5);
+    let sphere_2 = Sphere::new(vec3!(-1.0, -0.1, -1.0), MetalMaterial::new(vec3!(0.8, 0.8, 0.8), 0.3), 0.4);
+    let sphere_3 = Sphere::new(vec3!(1.0, -0.1, -1.0), MetalMaterial::new(vec3!(0.4, 0.9, 0.8), 0.9), 0.4);
     world.add_hittable(&sphere_ground);
     world.add_hittable(&sphere_1);
     world.add_hittable(&sphere_2);
+    world.add_hittable(&sphere_3);
 
     println!("P3");
     println!("{} {}", image_width, image_height);

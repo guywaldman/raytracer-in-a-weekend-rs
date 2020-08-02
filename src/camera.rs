@@ -4,7 +4,7 @@ use crate::{ray::Ray, vec3::Vec3};
 const ASPECT_RATIO: Scalar = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: Scalar = 2.0;
 const VIEWPORT_WIDTH: Scalar = ASPECT_RATIO * VIEWPORT_HEIGHT;
-const FOCAL_LENGTH: Scalar = 1.0;
+const FOCAL_LENGTH: Scalar = 0.9;
 
 pub(crate) struct Camera {
     origin: Vec3,
