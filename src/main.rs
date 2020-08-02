@@ -8,7 +8,7 @@ use ray::Ray;
 use sphere::Sphere;
 use world::World;
 use material::{ScatterRecord, LambertianMaterial, MetalMaterial};
-use vec3::Scalar;
+use vec3::{Point3, Scalar};
 
 #[macro_use]
 mod vec3;
@@ -23,7 +23,7 @@ mod ray;
 mod sphere;
 mod world;
 
-const SAMPLES_PER_PIXEL: usize = 30;
+const SAMPLES_PER_PIXEL: usize = 60;
 const MAX_BOUNCE_DEPTH: usize = 30;
 
 fn color_vec_to_output(color_vec: &Vec3) -> String {
@@ -80,14 +80,16 @@ fn main() {
     let image_height = ((image_width as Scalar) / aspect_ratio) as usize;
 
     // Camera
-    let camera = Camera::new();
+    let camera = Camera::new(Point3::new(-1, 1, 0.5), Point3::new(0, 0, -1), vec3!(0, 1, 0), 90.0, aspect_ratio);
+
+    let r = (std::f64::consts::PI / 4.0).cos();
 
     // World
     let mut world = World::new();
-    let sphere_ground = Sphere::new(vec3!(0.0, -100.5, -1.0), LambertianMaterial::new(vec3!(0.5, 0.5, 0.5)), 100.0);
-    let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), LambertianMaterial::new(vec3!(0.8, 0.4, 0.4)), 0.5);
-    let sphere_2 = Sphere::new(vec3!(-1.0, -0.1, -1.0), MetalMaterial::new(vec3!(0.8, 0.8, 0.8), 0.3), 0.4);
-    let sphere_3 = Sphere::new(vec3!(1.0, -0.1, -1.0), MetalMaterial::new(vec3!(0.4, 0.9, 0.8), 0.9), 0.4);
+    let sphere_ground = Sphere::new(vec3!(0, -100.5, -1), LambertianMaterial::new(vec3!(0.8, 0.8, 0.8)), 100.0);
+    let sphere_1 = Sphere::new(vec3!(r, 0, -1), LambertianMaterial::new(vec3!(0.8, 0.4, 0.4)), 0.5);
+    let sphere_2 = Sphere::new(vec3!(-1, -0.1, -1), MetalMaterial::new(vec3!(0.8, 0.8, 0.8), 0.3), 0.4);
+    let sphere_3 = Sphere::new(vec3!(2.0, 0, -1.0), MetalMaterial::new(vec3!(0.4, 0.9, 0.8), 0.9), 0.5);
     world.add_hittable(&sphere_ground);
     world.add_hittable(&sphere_1);
     world.add_hittable(&sphere_2);

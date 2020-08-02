@@ -10,9 +10,20 @@ pub(crate) struct Vec3 {
     z: Scalar,
 }
 
+pub(crate) type Point3 = Vec3;
+
 impl Vec3 {
-    pub fn new(x: Scalar, y: Scalar, z: Scalar) -> Self {
-        Vec3 { x, y, z }
+    pub fn new<T, U, V>(x: T, y: U, z: V) -> Self
+    where
+        T: Into<Scalar>,
+        U: Into<Scalar>,
+        V: Into<Scalar>,
+    {
+        Vec3 {
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+        }
     }
 
     pub fn x(&self) -> Scalar {

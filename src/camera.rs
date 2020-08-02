@@ -1,10 +1,5 @@
 use crate::vec3::Scalar;
-use crate::{ray::Ray, vec3::Vec3};
-
-const ASPECT_RATIO: Scalar = 16.0 / 9.0;
-const VIEWPORT_HEIGHT: Scalar = 2.0;
-const VIEWPORT_WIDTH: Scalar = ASPECT_RATIO * VIEWPORT_HEIGHT;
-const FOCAL_LENGTH: Scalar = 0.9;
+use crate::{ray::Ray, vec3::{Point3, Vec3}, math::degrees_to_radians};
 
 pub(crate) struct Camera {
     origin: Vec3,
@@ -14,11 +9,20 @@ pub(crate) struct Camera {
 }
 
 impl Camera {
-    pub fn new() -> Self {
-        let origin = vec3!(0.0, 0.0, 0.0);
-        let horizontal = vec3!(VIEWPORT_WIDTH, 0.0, 0.0);
-        let vertical = vec3!(0.0, VIEWPORT_HEIGHT, 0.0);
-        let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - vec3!(0.0, 0.0, FOCAL_LENGTH);
+    pub fn new(look_from: Point3, look_at: Point3, vup: Vec3, vfov: Scalar, aspect_ratio: Scalar) -> Self {
+        let theta = degrees_to_radians(vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h;
+        let viewport_width = aspect_ratio * viewport_height;
+
+        let w = (look_from - look_at).unit();
+        let u = vup.cross(&w).unit();
+        let v = w.cross(&u);
+
+        let origin = look_from;
+        let horizontal = viewport_width * u;
+        let vertical = viewport_height * v;
+        let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - w;
 
         Self {
             origin,
