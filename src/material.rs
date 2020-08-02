@@ -17,7 +17,7 @@ pub(crate) struct LambertianMaterial {
 
 impl LambertianMaterial {
     pub fn new(color: Vec3) -> Self {
-        LambertianMaterial {
+        Self {
             albedo: color
         }
     }
@@ -34,6 +34,32 @@ impl Material for LambertianMaterial {
         })
     }
 }
+
+#[derive(Clone, Copy)]
+pub(crate) struct MetalMaterial {
+    albedo: Vec3
+}
+
+impl MetalMaterial {
+    pub fn new(color: Vec3) -> Self {
+        Self {
+            albedo: color
+        }
+    }
+}
+
+impl Material for MetalMaterial {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<ScatterRecord> {
+        let reflected_ray = ray.dir().unit().reflect(&hit_record.normal);
+        let scattered_ray = Ray::new(hit_record.point, reflected_ray);
+        if scattered_ray.dir().dot(&hit_record.normal) > 0.0 {
+            let attenuation = self.albedo;
+            Some(ScatterRecord {
+                scattered_ray,
+                attenuation
+            })
+        } else {
+            None
         }
     }
 }

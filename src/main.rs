@@ -7,7 +7,7 @@ use math::clamp;
 use ray::Ray;
 use sphere::Sphere;
 use world::World;
-use material::{ScatterRecord, LambertianMaterial};
+use material::{ScatterRecord, LambertianMaterial, MetalMaterial};
 
 #[macro_use]
 mod vec3;
@@ -83,8 +83,10 @@ fn main() {
 
     // World
     let mut world = World::new();
+    let sphere_ground = Sphere::new(vec3!(0.0, -100.5, -1.0), LambertianMaterial::new(vec3!(0.5, 0.5, 0.5)), 100.0);
     let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), LambertianMaterial::new(vec3!(0.8, 0.4, 0.4)), 0.5);
-    let sphere_2 = Sphere::new(vec3!(0.0, -100.5, -1.0), LambertianMaterial::new(vec3!(0.5, 0.5, 0.5)), 100.0);
+    let sphere_2 = Sphere::new(vec3!(-1.0, 0.0, -1.0), MetalMaterial::new(vec3!(0.8, 0.8, 0.8)), 0.5);
+    world.add_hittable(&sphere_ground);
     world.add_hittable(&sphere_1);
     world.add_hittable(&sphere_2);
 
