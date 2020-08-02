@@ -1,8 +1,8 @@
+use crate::hit_record::HitRecord;
 use crate::{
     hittable::{self, Hittable},
     ray, vec3,
 };
-use hittable::HitRecord;
 
 pub(crate) struct World<'a> {
     hittables: Vec<Box<&'a dyn Hittable>>,

@@ -1,17 +1,21 @@
+use crate::hit_record::HitRecord;
+use crate::material::Material;
 use crate::vec3::{Scalar, Vec3};
-use crate::{
-    hittable::{HitRecord, Hittable},
-    ray::Ray,
-};
+use crate::{hittable::Hittable, ray::Ray};
 
-pub(crate) struct Sphere {
+pub(crate) struct Sphere<T> where T: Material {
     center: Vec3,
     radius: Scalar,
+    material: T,
 }
 
-impl Sphere {
-    pub fn new(center: Vec3, radius: Scalar) -> Self {
-        Self { center, radius }
+impl<T> Sphere<T> where T: Material {
+    pub fn new(center: Vec3, material: T, radius: Scalar) -> Self {
+        Self {
+            center,
+            radius,
+            material
+        }
     }
 
     #[allow(dead_code)]
@@ -25,7 +29,7 @@ impl Sphere {
     }
 }
 
-impl Hittable for Sphere {
+impl<T> Hittable for Sphere<T> where T: Material + Copy + 'static {
     fn hit(&self, ray: &Ray, t_min: Scalar, t_max: Scalar) -> Option<HitRecord> {
         let oc = ray.origin() - self.center;
         let a = ray.dir().length_squared();
@@ -44,12 +48,7 @@ impl Hittable for Sphere {
         for t in possible_params.iter().find(|t| **t > t_min && **t < t_max) {
             let point = ray.at(*t);
             let outward_normal = (point - self.center) / self.radius;
-            return Some(HitRecord::new(
-                &point,
-                &outward_normal,
-                *t,
-                &ray
-            ));
+            return Some(HitRecord::new(&point, &outward_normal, Box::new(self.material), *t, &ray));
         }
 
         None

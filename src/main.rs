@@ -1,16 +1,20 @@
+use crate::hit_record::HitRecord;
 use crate::rand::random_scalar;
 use crate::vec3::Vec3;
 use camera::Camera;
-use hittable::{HitRecord, Hittable};
+use hittable::{Hittable};
 use math::clamp;
 use ray::Ray;
 use sphere::Sphere;
 use world::World;
+use material::{ScatterRecord, LambertianMaterial};
 
 #[macro_use]
 mod vec3;
 
 mod camera;
+mod material;
+mod hit_record;
 mod hittable;
 mod math;
 mod rand;
@@ -54,10 +58,13 @@ fn pixel_color_for_ray(ray: &Ray, world: &World, depth: usize) -> Vec3 {
 
     // Check intersection with world.
     // Note: Using t_min of 0.001 to fix "shadow acne".
-    if let Some(HitRecord { normal, point, .. }) = world.hit(&ray, 0.001, std::f64::MAX) {
-        let target = point + normal + Vec3::random_in_unit_sphere();
+    if let Some(hit_record) = world.hit(&ray, 0.001, std::f64::MAX) {
+        if let Some(ScatterRecord { scattered_ray, attenuation }) = hit_record.material.scatter(ray, &hit_record) {
+            return attenuation * pixel_color_for_ray(&scattered_ray, world, depth - 1);
+        }
+        let target = hit_record.point + hit_record.normal + Vec3::random_unit_vector();
         // Shoot a random diffuse bounce ray and recurse.
-        return 0.5 * pixel_color_for_ray(&Ray::new(point, target - point), world, depth - 1);
+        return 0.5 * pixel_color_for_ray(&Ray::new(hit_record.point, target - hit_record.point), world, depth - 1);
     }
 
     let unit = ray.unit();
@@ -76,8 +83,8 @@ fn main() {
 
     // World
     let mut world = World::new();
-    let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), 0.5);
-    let sphere_2 = Sphere::new(vec3!(0.0, -100.5, -1.0), 100.0);
+    let sphere_1 = Sphere::new(vec3!(0.0, 0.0, -1.0), LambertianMaterial::new(vec3!(0.8, 0.4, 0.4)), 0.5);
+    let sphere_2 = Sphere::new(vec3!(0.0, -100.5, -1.0), LambertianMaterial::new(vec3!(0.5, 0.5, 0.5)), 100.0);
     world.add_hittable(&sphere_1);
     world.add_hittable(&sphere_2);
 

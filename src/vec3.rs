@@ -1,4 +1,5 @@
 use crate::rand::random_scalar;
+use core::f64::consts::PI;
 
 pub(crate) type Scalar = f64;
 
@@ -51,11 +52,26 @@ impl Vec3 {
         *self / self.length()
     }
 
+    pub fn reflect(&self, axis: &Self) -> Self {
+        *self - 2.0 * self.dot(axis) * *axis
+    }
+
     pub fn random(min: Scalar, max: Scalar) -> Self {
         Self {
             x: random_scalar(min, max),
             y: random_scalar(min, max),
             z: random_scalar(min, max),
+        }
+    }
+
+    pub fn random_unit_vector() -> Self {
+        let a = random_scalar(0.0, 2.0 * PI);
+        let z = random_scalar(-1.0, 1.0);
+        let r = (1.0 - z * z).sqrt();
+        Self {
+            x: r * a.cos(),
+            y: r * a.sin(),
+            z,
         }
     }
 
@@ -102,6 +118,17 @@ impl std::ops::Sub for Vec3 {
             x: self.x - other.x,
             y: self.y - other.y,
             z: self.z - other.z,
+        }
+    }
+}
+
+impl std::ops::Mul<Vec3> for Vec3 {
+    type Output = Self;
+    fn mul(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
         }
     }
 }
